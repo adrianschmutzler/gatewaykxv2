@@ -27,14 +27,14 @@ echo "Wir nutzen folgende fe80 IPv6: $fe80"
 
 if [ -z "$fastdport" ]; then
     fastdport=$fastdportbase
-    while grep $fastdport /etc/fastd/fff.bat*/fff.bat*.conf* &>/dev/null ; do ((fastdport+=1)); done
+    while grep $fastdport /etc/fastd/*/*.conf* &>/dev/null ; do ((fastdport+=1)); done
     echo "Wir nutzen $fastdport Port für fastd"
     ## $fastdport = port für fastdport
 fi
 
 if [ -z "$bat" ]; then
     bat=$batbase
-    while grep bat$bat /etc/systemd/system/fastd*bat*.service &>/dev/null ; do ((bat+=1)); done
+    while grep bat$bat /etc/radvd.conf &>/dev/null ; do ((bat+=1)); done
     echo "Wir nutzen $bat Nummer für Batman Interface"
     ## $bat = bat interface
 fi
