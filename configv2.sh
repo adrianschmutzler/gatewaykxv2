@@ -13,6 +13,12 @@ if [ ! -s "$conffile" ]; then
     exit 1;
 fi
 
+fastdsecret="$(cat ./fastdsecret)"
+if [ -z "$fastdsecret" ]; then
+    echo "Error: No fastd secret found!"
+    exit 1
+fi
+
 . "$conffile"
 
 #fe80 IPv6 holen:
@@ -47,7 +53,6 @@ batif="bat$bat"
 [ -z "$iflabel" ] && iflabel="fff.$batif"
 
 # Fastd config - /etc/fastd/fff.bat"$bat"
-fastdsecret="90e9418a189e18f6a126a554081b445690a63752baa763ac26339c8742308144"
 setupFastdConfig "$iflabel" "$batif" "$fastdinterfacename" "$fastdport" "$httpport" "$fastdsecret"
 
 # Network interfaces - /etc/network/interfaces.d/bat"$bat"
