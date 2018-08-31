@@ -25,7 +25,7 @@ echo "$basepath angelegt"
 
 echo "#!/bin/bash
 /sbin/ifup \$INTERFACE
-batctl -m $bat gw_mode server 256000
+batctl -m $bat gw_mode server 128000
 ip6tables -t nat -A PREROUTING -i $bat -p tcp -d fe80::1 --dport 2342 -j REDIRECT --to-port $httpport" > "$basepath/up.sh"
 # x setzen
 chmod a+x "$basepath/up.sh"
