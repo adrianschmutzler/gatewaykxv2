@@ -34,6 +34,7 @@ batctl -m $bat if add \$INTERFACE
 batctl -m $bat gw_mode server 128000
 
 ip6tables -t nat -A PREROUTING -i $bat -p tcp -d fe80::1 --dport 2342 -j REDIRECT --to-port $httpport
+ip6tables -t nat -A PREROUTING -i $bat -p tcp -d fe80::fff:1 --dport 2342 -j REDIRECT --to-port $httpport
 " > "$basepath/up.sh"
 chmod a+x "$basepath/up.sh"
 echo "$basepath/up.sh angelegt"
@@ -111,6 +112,7 @@ iface $bat inet manual
     post-up ip addr add $ipv4 dev \$IFACE
     post-up ip -6 addr add $fe80 dev \$IFACE
     post-up ip -6 addr add fe80::1/64 dev \$IFACE nodad
+    post-up ip -6 addr add fe80::fff:1/64 dev \$IFACE nodad
     post-up ip -6 addr add $fd43 dev \$IFACE
     #IPv6Addr#
 
