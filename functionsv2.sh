@@ -387,7 +387,7 @@ Target[dhcpleasecount$bat]: \`$cfgdhcp\`
 MaxBytes[dhcpleasecount$bat]: $numaddr
 YLegend[dhcpleasecount$bat]: DHCP Count
 ShortLegend[dhcpleasecount$bat]: x
-Unscaled[dhcpleasecount$bat]: ymwd
+#Unscaled[dhcpleasecount$bat]: ymwd
 LegendI[dhcpleasecount$bat]: Count
 LegendO[dhcpleasecount$bat]:
 
