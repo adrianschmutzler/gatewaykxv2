@@ -205,7 +205,7 @@ local lon="$3"
 
 local cronfile="/etc/cron.d/$iflabel"
 
-echo "*/5 * * * * root wget \"http://keyserver.freifunk-franken.de/v2/index.php?lat=$lat&long=$lon\" -O /var/www/$iflabel/keyxchangev2data
+echo "1-59/5 * * * * root wget \"http://keyserver.freifunk-franken.de/v2/index.php?lat=$lat&long=$lon\" -O /var/www/$iflabel/keyxchangev2data
 " > "$cronfile"
 echo "Cronjob in $cronfile angelegt"
 
