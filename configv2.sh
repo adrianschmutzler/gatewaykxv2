@@ -56,7 +56,7 @@ batif="bat$bat"
 setupFastdConfig "$iflabel" "$batif" "$fastdinterfacename" "$fastdport" "$httpport" "$fastdsecret"
 
 # Network interfaces - /etc/network/interfaces.d/<iflabel>.cfg
-setupInterface "$iflabel" "$batif" "$fastdinterfacename" "$Hoodname" "$ipv4" "$ipv6" "$fe80" "$ipv4net" "$ipv6net"
+setupInterface "$iflabel" "$batif" "$fastdinterfacename" "$hoodname" "$ipv4" "$ipv6" "$fe80" "$ipv4net" "$ipv6net"
 
 # Fastd service - /etc/systemd/system/fastd-<iflabel>.service
 setupFastdService "$iflabel"
@@ -76,7 +76,7 @@ echo "Config für Apache neu geladen und Apache neu gestartet"
 setupCronHoodfile "$iflabel" "$lat" "$lon"
 
 # Dnsmasq service - /etc/systemd/system/dnsmasq-<iflabel>.service
-setupDnsmasq "$iflabel" "$batif" "$dhcpstart" "$dhcpende" "$ipv4netmask"
+setupDnsmasq "$iflabel" "$batif" "$dhcpstart" "$dhcpend" "$ipv4netmask"
 
 systemctl enable "dnsmasq-$iflabel.service"
 systemctl start "dnsmasq-$iflabel.service"
@@ -96,6 +96,6 @@ systemctl start "alfred-$iflabel"
 echo "Alfred Service gestartet und enabled"
 
 # MRTG Config neu machen - /etc/mrtg/dhcp.cfg
-setupMrtg "$iflabel" "$batif" "$Hoodname" "$mengeaddr"
+setupMrtg "$iflabel" "$batif" "$hoodname" "$numaddr"
 
 echo "Script fertig"
