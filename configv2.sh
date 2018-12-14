@@ -34,7 +34,7 @@ fi
 
 if [ -z "$bat" ]; then
     bat=$batbase
-    while grep bat$bat /etc/radvd.conf &>/dev/null ; do ((bat+=1)); done
+    while grep "bat$bat " /etc/radvd.conf &>/dev/null ; do ((bat+=1)); done
     echo "Wir nutzen $bat Nummer für Batman Interface"
     ## $bat = bat interface
 fi
