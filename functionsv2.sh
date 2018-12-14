@@ -185,7 +185,7 @@ echo "$wwwfolder angelegt"
 sed -i '4i Listen '$httpport'' /etc/apache2/ports.conf
 echo "Port in /etc/apache2/ports.conf erweitert"
 
-echo "$(hostname)" > "$wwwfolder/gateway"
+echo "adrian-gw1" > "$wwwfolder/gateway"
 echo "$wwwfolder/gateway angelegt"
 
 return 0
