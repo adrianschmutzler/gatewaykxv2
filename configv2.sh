@@ -59,7 +59,7 @@ ifup "$batif"
 echo "$batif Interface gestartet"
 
 # Fastd config - /etc/fastd/<iflabel>/...
-setupFastdConfig "$iflabel" "$batif" "$fastdinterfacename" "$fastdport" "$httpport" "$fastdsecret"
+setupFastdConfig "$iflabel" "$batif" "$fastdinterfacename" "$fastdport" "$httpport" "$fastdsecret" "$gwbandwidth"
 
 # Fastd service - /etc/systemd/system/fastd-<iflabel>.service
 setupFastdService "$iflabel"

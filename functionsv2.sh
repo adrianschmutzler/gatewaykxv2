@@ -2,8 +2,8 @@
 
 setupFastdConfig() {
 
-if [ $# -ne "6" ]; then
-	echo "Usage: setupFastdConfig <interface label> <batX> <fastd interface name> <fastd port> <httpport> <secret>"
+if [ $# -ne "6" ] && [ $# -ne "7" ]; then
+	echo "Usage: setupFastdConfig <interface label> <batX> <fastd interface name> <fastd port> <httpport> <secret> [<gwbandwidth>]"
 	return 1
 fi
 
@@ -13,6 +13,9 @@ local fastdifname="$3"
 local fastdport="$4"
 local httpport="$5"
 local secret="$6"
+local gwbandwidth="$7"
+
+[ -n "$gwbandwidth" ] || gwbandwidth="128000"
 
 local basepath="/etc/fastd/$iflabel"
 
@@ -31,7 +34,7 @@ echo "#!/bin/bash
 
 ip link set dev \$INTERFACE up
 batctl -m $bat if add \$INTERFACE
-batctl -m $bat gw_mode server 128000
+batctl -m $bat gw_mode server "$gwbandwidth"
 
 ip6tables -t nat -A PREROUTING -i $bat -p tcp -d fe80::1 --dport 2342 -j REDIRECT --to-port $httpport
 ip6tables -t nat -A PREROUTING -i $bat -p tcp -d fe80::fff:1 --dport 2342 -j REDIRECT --to-port $httpport
