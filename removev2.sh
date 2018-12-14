@@ -18,10 +18,16 @@ systemctl disable "fastd-$iflabel"
 
 fastdpath="/etc/fastd/$iflabel"
 rm -R "$fastdpath"
-iffile="/etc/network/interfaces.d/$iflabel.cfg"
-rm "$iffile"
+
 fastdsrvfile="/etc/systemd/system/fastd-$iflabel.service"
 rm "$fastdsrvfile"
+
+# Interface
+iffile="/etc/network/interfaces.d/$iflabel.cfg"
+bat="$(grep -m 1 -o "bat[0-9]* " "$iffile")"
+ifdown $bat
+ip link del $bat
+rm "$iffile"
 
 # Apache
 a2dissite "$iflabel"
