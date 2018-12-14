@@ -52,20 +52,20 @@ fi
 batif="bat$bat"
 [ -z "$iflabel" ] && iflabel="fff.$batif"
 
-# Fastd config - /etc/fastd/fff.bat"$bat"
+# Fastd config - /etc/fastd/<iflabel>/...
 setupFastdConfig "$iflabel" "$batif" "$fastdinterfacename" "$fastdport" "$httpport" "$fastdsecret"
 
-# Network interfaces - /etc/network/interfaces.d/bat"$bat"
+# Network interfaces - /etc/network/interfaces.d/<iflabel>.cfg
 setupInterface "$iflabel" "$batif" "$fastdinterfacename" "$Hoodname" "$ipv4" "$ipv6" "$fe80" "$ipv4net" "$ipv6net"
 
-# Fastd service - /etc/systemd/system/fastdbat"$bat".service
+# Fastd service - /etc/systemd/system/fastd-<iflabel>.service
 setupFastdService "$iflabel"
 
 systemctl enable "fastd-$iflabel"
 systemctl start "fastd-$iflabel"
 echo "fastd Service gestartet und enabled"
 
-# Apache config - /etc/apache2/sites-available/bat"$bat".conf
+# Apache config - /etc/apache2/sites-available/<iflabel>.conf
 setupApache "$iflabel" "$httpport"
 
 a2ensite "$iflabel"
@@ -75,7 +75,7 @@ echo "Config für Apache neu geladen und Apache neu gestartet"
 # Cronjob für Hoodfile anlegen
 setupCronHoodfile "$iflabel" "$lat" "$lon"
 
-# Dnsmasq service - /etc/systemd/system/dnsmasqbat"$bat".service
+# Dnsmasq service - /etc/systemd/system/dnsmasq-<iflabel>.service
 setupDnsmasq "$iflabel" "$batif" "$dhcpstart" "$dhcpende" "$ipv4netmask"
 
 systemctl enable "dnsmasq-$iflabel.service"
@@ -88,7 +88,7 @@ setupRadvd "$batif" "$fe80" "$ipv6net"
 /etc/init.d/radvd restart
 echo "radvd neu gestartet"
 
-# Alfred service - /etc/systemd/system/alfredbat"$bat".service
+# Alfred service - /etc/systemd/system/alfred-<iflabel>.service
 setupAlfred "$iflabel" "$batif"
 
 systemctl enable "alfred-$iflabel"
