@@ -52,11 +52,14 @@ fi
 batif="bat$bat"
 [ -z "$iflabel" ] && iflabel="fff.$batif"
 
+# Network interface - /etc/network/interfaces.d/<iflabel>.cfg
+setupInterface "$iflabel" "$batif" "$fe80" "$ipv4" "$ipv4net" "$fd43" "$fd43net" "$ipv6" "$ipv6net"
+
+ifup "$batif"
+echo "$batif Interface gestartet"
+
 # Fastd config - /etc/fastd/<iflabel>/...
 setupFastdConfig "$iflabel" "$batif" "$fastdinterfacename" "$fastdport" "$httpport" "$fastdsecret"
-
-# Network interfaces - /etc/network/interfaces.d/<iflabel>.cfg
-setupInterface "$iflabel" "$batif" "$fastdinterfacename" "$hoodname" "$ipv4" "$ipv6" "$fe80" "$ipv4net" "$ipv6net"
 
 # Fastd service - /etc/systemd/system/fastd-<iflabel>.service
 setupFastdService "$iflabel"
@@ -83,7 +86,7 @@ systemctl start "dnsmasq-$iflabel.service"
 echo "dnsmasq enabled und gestartet"
 
 # Radvd config - /etc/radvd.conf
-setupRadvd "$batif" "$fe80" "$ipv6net"
+setupRadvd "$batif" "$fe80" "$fd43net" "$ipv6net"
 
 /etc/init.d/radvd restart
 echo "radvd neu gestartet"

@@ -17,26 +17,36 @@ local secret="$6"
 local basepath="/etc/fastd/$iflabel"
 
 mkdir "$basepath"
+
+# down.sh
 echo "#!/bin/bash
-/sbin/ifdown \$INTERFACE" > "$basepath/down.sh"
-# x setzen
+
+ip link set dev \$INTERFACE down
+" > "$basepath/down.sh"
 chmod a+x "$basepath/down.sh"
 echo "$basepath angelegt"
 
+# up.sh
 echo "#!/bin/bash
-/sbin/ifup \$INTERFACE
+
+ip link set dev \$INTERFACE up
+batctl -m $bat if add \$INTERFACE
 batctl -m $bat gw_mode server 128000
-ip6tables -t nat -A PREROUTING -i $bat -p tcp -d fe80::1 --dport 2342 -j REDIRECT --to-port $httpport" > "$basepath/up.sh"
-# x setzen
+
+ip6tables -t nat -A PREROUTING -i $bat -p tcp -d fe80::1 --dport 2342 -j REDIRECT --to-port $httpport
+" > "$basepath/up.sh"
 chmod a+x "$basepath/up.sh"
 echo "$basepath/up.sh angelegt"
 
+# verify.sh
 echo "#!/bin/bash
-return 0" > "$basepath/verify.sh"
-# x setzen
+
+return 0
+" > "$basepath/verify.sh"
 chmod a+x "$basepath/verify.sh"
 echo "$basepath/verify.sh angelegt"
 
+# fastd config
 echo "# Log warnings and errors to stderr
 log level error;
 
@@ -74,54 +84,59 @@ return 0
 
 setupInterface() {
 
-if [ $# -ne "9" ]; then
-	echo "Usage: setupInterface <interface label> <batX> <fastd interface name> <hood name> <ipv4 address> <ipv6 address> <fe80 address> <ipv4 net> <ipv6 net>"
+if [ $# -lt "7" ] || [ $# -gt "9" ]; then
+	echo "Usage: setupInterface <interface label> <batX> <fe80 address> <ipv4 address> <ipv4 net> <fd43 address> <fd43 net> [<ipv6 address> <ipv6 net>]"
 	return 1
 fi
 
 local iflabel="$1"
 local bat="$2"
-local fastdifname="$3"
-local hoodname="$4"
-local ipv4="$5"
-local ipv6="$6"
-local fe80="$7"
-local ipv4net="$8"
+local fe80="$3"
+local ipv4="$4"
+local ipv4net="$5"
+local fd43="$6"
+local fd43net="$7"
+local ipv6="$8"
 local ipv6net="$9"
 
 local configfile="/etc/network/interfaces.d/$iflabel.cfg"
 
-echo "#device: $bat
+echo "
+auto $bat
 iface $bat inet manual
-    post-up ip link set dev \$IFACE up
-    ##Einschalten post-up:
-    # IP des Gateways am B.A.T.M.A.N interface:
+    pre-up ip link add \$IFACE type batadv
+    up ip link set dev \$IFACE up
+
+    # IPs
     post-up ip addr add $ipv4 dev \$IFACE
-    post-up ip -6 addr add fe80::1/64 dev \$IFACE nodad
-    post-up ip -6 addr add $ipv6 dev \$IFACE
     post-up ip -6 addr add $fe80 dev \$IFACE
-    # Regeln, wann die fff Routing-Tabelle benutzt werden soll:
+    post-up ip -6 addr add fe80::1/64 dev \$IFACE nodad
+    post-up ip -6 addr add $fd43 dev \$IFACE
+    #IPv6Addr#
+
+    # Rules (use fff table)
     post-up ip rule add iif \$IFACE table fff
     post-up ip -6 rule add iif \$IFACE table fff
-    # Route in die XXXXXXXX Hood:
+
+    # Routes
     post-up ip route replace $ipv4net dev \$IFACE proto static table fff
-    post-up ip -6 route replace $ipv6net dev \$IFACE proto static table fff
+    post-up ip -6 route replace $fd43net dev \$IFACE proto static table fff
+    #IPv6Route#
 
-    ##Ausschalten post-down:
-    # Loeschen von oben definieren Routen, Regeln und Interface:
-    post-down ip route del $ipv4net dev \$IFACE table fff
-    post-down ip -6 route del $ipv6net dev \$IFACE proto static table fff
-    post-down ip rule del iif \$IFACE table fff
-    post-down ip link set dev \$IFACE down
+    # Down
+    down ip addr flush dev \$IFACE
+    down ip route del $ipv4net dev \$IFACE proto static table fff
+    down ip -6 route del $fd43net dev \$IFACE proto static table fff
+    #IPv6RouteDel#
+    down ip rule del iif \$IFACE table fff
+    down ip -6 rule del iif \$IFACE table fff
+    down ip link set dev \$IFACE down
+    post-down ip link del \$IFACE type batadv
 
-# VPN Verbindung in die $hoodname Hood
-iface $fastdifname inet manual
-    post-up batctl -m $bat if add \$IFACE
-    post-up ip link set dev \$IFACE up
-    post-up ifup $bat
-    post-down ifdown $bat
-    post-down ip link set dev \$IFACE down
 " > "$configfile"
+[ -n "$ipv6" ] && sed -i "s=#IPv6Addr#=post-up ip -6 addr add $ipv6 dev \$IFACE=" "$configfile"
+[ -n "$ipv6net" ] && sed -i "s=#IPv6Route#=post-up ip -6 route replace $ipv6net dev \$IFACE proto static table fff=" "$configfile"
+[ -n "$ipv6net" ] && sed -i "s=#IPv6RouteDel#=down ip -6 route del $ipv6net dev \$IFACE proto static table fff=" "$configfile"
 echo "$configfile angelegt"
 
 return 0
@@ -141,6 +156,7 @@ local configfile="/etc/systemd/system/fastd-$iflabel.service"
 
 echo "[Unit]
 Description=fastd
+After=network.target auditd.service
 
 [Service]
 ExecStart=/usr/bin/fastd -c /etc/fastd/$iflabel/$iflabel.conf
@@ -250,29 +266,40 @@ return 0
 
 setupRadvd() {
 
-if [ $# -ne "3" ]; then
-	echo "Usage: setupFastdConfig <batX> <fe80 address> <ipv6 prefix>"
+if [ $# -ne "3" ] && [ $# -ne "4" ]; then
+	echo "Usage: setupFastdConfig <batX> <fe80 address> <fd43 prefix> [<ipv6 prefix>]"
 	return 1
 fi
 
 local bat="$1"
 local fe80="$2"
-local ipv6net="$3"
+local fd43net="$3"
+local ipv6net="$4"
 
 local configfile="/etc/radvd.conf"
+
+[ -n "$ipv6net" ] && lifetime=600 || lifetime=0
 
 echo "interface $bat {
         AdvSendAdvert on;
         MinRtrAdvInterval 60;
         MaxRtrAdvInterval 300;
-        AdvDefaultLifetime 600;
+        AdvDefaultLifetime $lifetime;
         AdvRASrcAddress {
                 ${fe80%/*}; 
         };
+        prefix $fd43net {
+                AdvOnLink on;
+                AdvAutonomous on;
+        };" >> "$configfile"
+if [ -n "$ipv6net" ]; then
+	echo "
         prefix $ipv6net {
                 AdvOnLink on;
                 AdvAutonomous on;
-        };
+        };" >> "$configfile"
+fi
+echo "
         route fc00::/7 {
         };
 };" >> "$configfile"
