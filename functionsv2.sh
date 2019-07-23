@@ -313,6 +313,8 @@ if [ -n "$ipv6net" ]; then
         };" >> "$configfile"
 fi
 echo "
+        RDNSS fd43:5602:29bd:ffff::62 fd43:5602:29bd:ffff:a:a:a:a { };
+
         route fc00::/7 {
         };
 };" >> "$configfile"
