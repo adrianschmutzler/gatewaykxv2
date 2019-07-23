@@ -215,18 +215,26 @@ return 0
 
 setupCronHoodfile() {
 
-if [ $# -ne "3" ]; then
-	echo "Usage: setupCronHoodfile <interface label> <latitude> <longitude>"
+if [ $# -ne "4" ]; then
+	echo "Usage: setupCronHoodfile <interface label> <hoodid or empty> <latitude> <longitude>"
 	return 1
 fi
 
 local iflabel="$1"
-local lat="$2"
-local lon="$3"
+local hoodid="$2"
+local lat="$3"
+local lon="$4"
 
 local cronfile="/etc/cron.d/$iflabel"
+local url
 
-echo "1-59/5 * * * * root wget \"http://keyserver.freifunk-franken.de/v2/index.php?lat=$lat&long=$lon\" -O /var/www/$iflabel/keyxchangev2data
+if [ -n "$hoodid" ]; then
+	url=http://keyserver.freifunk-franken.de/v2/index.php?hoodid=$hoodid
+else
+	url=http://keyserver.freifunk-franken.de/v2/index.php?lat=$lat&long=$lon
+fi
+
+echo "1-59/5 * * * * root wget \"$url\" -O /var/www/$iflabel/keyxchangev2data
 " > "$cronfile"
 echo "Cronjob in $cronfile angelegt"
 

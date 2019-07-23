@@ -76,7 +76,7 @@ systemctl reload apache2
 echo "Config für Apache neu geladen und Apache neu gestartet"
 
 # Cronjob für Hoodfile anlegen
-setupCronHoodfile "$iflabel" "$lat" "$lon"
+setupCronHoodfile "$iflabel" "$hoodid" "$lat" "$lon"
 
 # Dnsmasq service - /etc/systemd/system/dnsmasq-<iflabel>.service
 setupDnsmasq "$iflabel" "$batif" "$dhcpstart" "$dhcpend" "$ipv4netmask"
