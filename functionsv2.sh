@@ -225,7 +225,7 @@ local hoodid="$2"
 local lat="$3"
 local lon="$4"
 
-local cronfile="/etc/cron.d/$iflabel"
+local cronfile="/etc/cron.d/hoodfile-$iflabel"
 local url
 
 if [ -n "$hoodid" ]; then

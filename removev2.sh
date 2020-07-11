@@ -43,7 +43,7 @@ rm "$wwwfile"
 rm -R "$wwwfolder"
 
 # Cron file
-cronfile="/etc/cron.d/$iflabel"
+cronfile="/etc/cron.d/hoodfile-$iflabel"
 rm "$cronfile"
 
 # Dnsmasq
