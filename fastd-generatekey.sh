@@ -1,0 +1,1 @@
+fastd --generate-key
