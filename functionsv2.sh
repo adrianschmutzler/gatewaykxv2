@@ -380,7 +380,7 @@ echo "$cfgdhcp angelegt und ausführbar gemacht"
 
 local cfggwl="/etc/mrtg/gwl-$iflabel.sh"
 echo "#!/bin/bash
-gwlcount=\$(/usr/sbin/batctl -m $bat gwl -H | wc -l)
+gwlcount=\$(/usr/local/sbin/batctl meshif $bat gwl -H | wc -l)
 echo \"\$gwlcount\"
 echo \"\$gwlcount\"
 echo 0
