@@ -13,13 +13,12 @@ if [ ! -s "$conffile" ]; then
     exit 1;
 fi
 
-fastdsecret="$(cat ./fastdsecret)"
+. "$conffile"
+
 if [ -z "$fastdsecret" ]; then
     echo "Error: No fastd secret found!"
     exit 1
 fi
-
-. "$conffile"
 
 #fe80 IPv6 holen:
 fe80=$(ip -6 addr show $ethernetinterface | grep "inet6 fe80" | grep -v "inet6 fe80::1" | tail -n 1 | cut -d " " -f6)
