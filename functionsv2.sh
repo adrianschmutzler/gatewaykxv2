@@ -33,8 +33,8 @@ echo "$basepath angelegt"
 echo "#!/bin/bash
 
 ip link set dev \$INTERFACE up
-batctl -m $bat if add \$INTERFACE
-batctl -m $bat gw_mode server "$gwbandwidth"
+batctl meshif $bat if add \$INTERFACE
+batctl meshif $bat gw_mode server "$gwbandwidth"
 
 ip6tables -t nat -A PREROUTING -i $bat -p tcp -d fe80::1 --dport 2342 -j REDIRECT --to-port $httpport
 ip6tables -t nat -A PREROUTING -i $bat -p tcp -d fe80::fff:1 --dport 2342 -j REDIRECT --to-port $httpport
